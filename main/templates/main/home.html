@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>House Finder - Search Properties</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.2em;
+        }
+
+        .search-form {
+            background-color: #f9f9f9;
+            padding: 30px;
+            border-radius: 10px;
+            margin: 30px 0;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .multi-select {
+            position: relative;
+        }
+
+        .select-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: white;
+        }
+
+        .select-input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 5px 5px;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+            z-index: 1000;
+        }
+
+        .dropdown.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f5f5f5;
+        }
+
+        .dropdown-item.selected {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .selected-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .selected-tag {
+            background-color: #3498db;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .tag-remove {
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .search-btn {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+
+        .search-btn:hover {
+            background-color: #2980b9;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        nav {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        nav a {
+            display: inline-block;
+            margin: 0 15px;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        nav a:hover {
+            background-color: #2980b9;
+        }
+
+        .location-type {
+            font-size: 12px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: 8px;
+            font-weight: normal;
+        }
+
+        .city-tag {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .province-tag {
+            background-color: #f39c12;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>🏠 House Finder</h1>
+            <p class="subtitle">Find Your Dream Home by Location</p>
+        </header>
+
+        <form class="search-form" id="searchForm">
+            <div class="form-group">
+                <label for="locations">Select Cities or Provinces:</label>
+                <div class="multi-select">
+                    <input type="text" class="select-input" id="locations"
+                        placeholder="Search and select cities or provinces..." readonly>
+                    <div class="dropdown" id="locationsDropdown"></div>
+                    <div class="selected-items" id="selectedLocations"></div>
+                </div>
+            </div>
+
+            <button type="submit" class="search-btn">🔍 Search Properties</button>
+        </form>
+
+        <nav>
+            <a href="/">Home</a>
+            <a href="/about/">About</a>
+            <a href="/admin/">Admin</a>
+        </nav>
+
+        <footer style="text-align: center; margin-top: 40px; color: #666;">
+            <p>&copy; 2025 House Finder. Built with Django.</p>
+        </footer>
+    </div>
+
+    <script>
+        // City and province data from CSV
+        const cityData = [
+            { city: "Amsterdam", province: "Noord-Holland", population: 872680, postal_prefix: "10" },
+            { city: "Rotterdam", province: "Zuid-Holland", population: 651376, postal_prefix: "30" },
+            { city: "The Hague", province: "Zuid-Holland", population: 548320, postal_prefix: "25" },
+            { city: "Utrecht", province: "Utrecht", population: 361924, postal_prefix: "35" },
+            { city: "Eindhoven", province: "Noord-Brabant", population: 234235, postal_prefix: "56" },
+            { city: "Groningen", province: "Groningen", population: 233218, postal_prefix: "97" },
+            { city: "Tilburg", province: "Noord-Brabant", population: 219800, postal_prefix: "50" },
+            { city: "Almere", province: "Flevoland", population: 214715, postal_prefix: "13" },
+            { city: "Breda", province: "Noord-Brabant", population: 184403, postal_prefix: "48" },
+            { city: "Nijmegen", province: "Gelderland", population: 177659, postal_prefix: "65" },
+            { city: "Haarlem", province: "Noord-Holland", population: 162961, postal_prefix: "20" },
+            { city: "Arnhem", province: "Gelderland", population: 161368, postal_prefix: "68" },
+            { city: "Zaanstad", province: "Noord-Holland", population: 156711, postal_prefix: "15" },
+            { city: "'s-Hertogenbosch", province: "Noord-Brabant", population: 155113, postal_prefix: "52" },
+            { city: "Amersfoort", province: "Utrecht", population: 157279, postal_prefix: "38" },
+            { city: "Maastricht", province: "Limburg", population: 121558, postal_prefix: "62" },
+            { city: "Dordrecht", province: "Zuid-Holland", population: 119300, postal_prefix: "33" },
+            { city: "Leiden", province: "Zuid-Holland", population: 125174, postal_prefix: "23" },
+            { city: "Haarlemmermeer", province: "Noord-Holland", population: 156039, postal_prefix: "21" },
+            { city: "Zoetermeer", province: "Zuid-Holland", population: 125283, postal_prefix: "27" },
+            { city: "Zwolle", province: "Overijssel", population: 129853, postal_prefix: "80" },
+            { city: "Emmen", province: "Drenthe", population: 107055, postal_prefix: "78" },
+            { city: "Ede", province: "Gelderland", population: 117166, postal_prefix: "67" },
+            { city: "Delft", province: "Zuid-Holland", population: 103659, postal_prefix: "26" },
+            { city: "Westland", province: "Zuid-Holland", population: 110357, postal_prefix: "26" },
+            { city: "Venlo", province: "Limburg", population: 101797, postal_prefix: "59" },
+            { city: "Deventer", province: "Overijssel", population: 100718, postal_prefix: "74" },
+            { city: "Alkmaar", province: "Noord-Holland", population: 109444, postal_prefix: "18" },
+            { city: "Leeuwarden", province: "Friesland", population: 123107, postal_prefix: "89" },
+            { city: "Hilversum", province: "Noord-Holland", population: 92407, postal_prefix: "12" }
+        ];
+
+        // Create combined location data
+        const provinces = [...new Set(cityData.map(item => item.province))].sort();
+        const cities = cityData.map(item => ({ name: item.city, type: 'city' })).sort((a, b) => a.name.localeCompare(b.name));
+        const provinceItems = provinces.map(province => ({ name: province, type: 'province' }));
+
+        const allLocations = [...cities, ...provinceItems].sort((a, b) => a.name.localeCompare(b.name));
+
+        let selectedLocations = [];
+
+        function initializeDropdowns() {
+            setupDropdown();
+        }
+
+        function setupDropdown() {
+            const input = document.getElementById('locations');
+            const dropdown = document.getElementById('locationsDropdown');
+
+            input.addEventListener('click', () => {
+                dropdown.classList.toggle('show');
+                populateDropdown();
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+                    dropdown.classList.remove('show');
+                }
+            });
+        }
+
+        function populateDropdown() {
+            const dropdown = document.getElementById('locationsDropdown');
+            dropdown.innerHTML = '';
+
+            allLocations.forEach(location => {
+                const div = document.createElement('div');
+                div.className = 'dropdown-item';
+
+                const isSelected = selectedLocations.some(selected => selected.name === location.name && selected.type === location.type);
+                if (isSelected) {
+                    div.classList.add('selected');
+                }
+
+                div.innerHTML = `
+                    <span>${location.name}</span>
+                    <span class="location-type ${location.type}-tag">${location.type}</span>
+                `;
+
+                div.addEventListener('click', () => toggleSelection(location));
+                dropdown.appendChild(div);
+            });
+        }
+
+        function toggleSelection(location) {
+            const index = selectedLocations.findIndex(selected => selected.name === location.name && selected.type === location.type);
+            if (index > -1) {
+                selectedLocations.splice(index, 1);
+            } else {
+                selectedLocations.push(location);
+            }
+            updateSelectedTags();
+        }
+
+        function updateSelectedTags() {
+            const container = document.getElementById('selectedLocations');
+            container.innerHTML = '';
+
+            selectedLocations.forEach(location => {
+                const tag = document.createElement('div');
+                tag.className = 'selected-tag';
+                tag.innerHTML = `
+                    ${location.name}
+                    <span class="location-type ${location.type}-tag">${location.type}</span>
+                    <span class="tag-remove" onclick="removeSelection('${location.name}', '${location.type}')">&times;</span>
+                `;
+                container.appendChild(tag);
+            });
+        }
+
+        function removeSelection(name, type) {
+            const index = selectedLocations.findIndex(selected => selected.name === name && selected.type === type);
+            if (index > -1) {
+                selectedLocations.splice(index, 1);
+                updateSelectedTags();
+            }
+        }
+
+        document.getElementById('searchForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const cities = selectedLocations.filter(loc => loc.type === 'city').map(loc => loc.name);
+            const provinces = selectedLocations.filter(loc => loc.type === 'province').map(loc => loc.name);
+
+            const searchParams = { cities, provinces };
+            console.log('Search parameters:', searchParams);
+
+            alert(`Searching for properties in:\nCities: ${cities.join(', ')}\nProvinces: ${provinces.join(', ')}`);
+        });
+
+        // Initialize the dropdown when the page loads
+        document.addEventListener('DOMContentLoaded', initializeDropdowns);
+    </script>
+</body>
+
+</html>
