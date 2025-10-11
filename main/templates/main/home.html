@@ -250,39 +250,8 @@
     </div>
 
     <script>
-        // City and province data from CSV
-        const cityData = [
-            { city: "Amsterdam", province: "Noord-Holland", population: 872680, postal_prefix: "10" },
-            { city: "Rotterdam", province: "Zuid-Holland", population: 651376, postal_prefix: "30" },
-            { city: "The Hague", province: "Zuid-Holland", population: 548320, postal_prefix: "25" },
-            { city: "Utrecht", province: "Utrecht", population: 361924, postal_prefix: "35" },
-            { city: "Eindhoven", province: "Noord-Brabant", population: 234235, postal_prefix: "56" },
-            { city: "Groningen", province: "Groningen", population: 233218, postal_prefix: "97" },
-            { city: "Tilburg", province: "Noord-Brabant", population: 219800, postal_prefix: "50" },
-            { city: "Almere", province: "Flevoland", population: 214715, postal_prefix: "13" },
-            { city: "Breda", province: "Noord-Brabant", population: 184403, postal_prefix: "48" },
-            { city: "Nijmegen", province: "Gelderland", population: 177659, postal_prefix: "65" },
-            { city: "Haarlem", province: "Noord-Holland", population: 162961, postal_prefix: "20" },
-            { city: "Arnhem", province: "Gelderland", population: 161368, postal_prefix: "68" },
-            { city: "Zaanstad", province: "Noord-Holland", population: 156711, postal_prefix: "15" },
-            { city: "'s-Hertogenbosch", province: "Noord-Brabant", population: 155113, postal_prefix: "52" },
-            { city: "Amersfoort", province: "Utrecht", population: 157279, postal_prefix: "38" },
-            { city: "Maastricht", province: "Limburg", population: 121558, postal_prefix: "62" },
-            { city: "Dordrecht", province: "Zuid-Holland", population: 119300, postal_prefix: "33" },
-            { city: "Leiden", province: "Zuid-Holland", population: 125174, postal_prefix: "23" },
-            { city: "Haarlemmermeer", province: "Noord-Holland", population: 156039, postal_prefix: "21" },
-            { city: "Zoetermeer", province: "Zuid-Holland", population: 125283, postal_prefix: "27" },
-            { city: "Zwolle", province: "Overijssel", population: 129853, postal_prefix: "80" },
-            { city: "Emmen", province: "Drenthe", population: 107055, postal_prefix: "78" },
-            { city: "Ede", province: "Gelderland", population: 117166, postal_prefix: "67" },
-            { city: "Delft", province: "Zuid-Holland", population: 103659, postal_prefix: "26" },
-            { city: "Westland", province: "Zuid-Holland", population: 110357, postal_prefix: "26" },
-            { city: "Venlo", province: "Limburg", population: 101797, postal_prefix: "59" },
-            { city: "Deventer", province: "Overijssel", population: 100718, postal_prefix: "74" },
-            { city: "Alkmaar", province: "Noord-Holland", population: 109444, postal_prefix: "18" },
-            { city: "Leeuwarden", province: "Friesland", population: 123107, postal_prefix: "89" },
-            { city: "Hilversum", province: "Noord-Holland", population: 92407, postal_prefix: "12" }
-        ];
+        // City and province data from CSV (loaded from Django backend)
+        const cityData = {{ city_data_json| safe }};
 
         // Create combined location data
         const provinces = [...new Set(cityData.map(item => item.province))].sort();
