@@ -122,3 +122,12 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Azure Blob Storage Configuration
+# For local development, uses Azurite (Azure Storage Emulator)
+# For production, set AZURE_STORAGE_CONNECTION_STRING environment variable
+import os
+AZURE_STORAGE_CONNECTION_STRING = os.getenv(
+    'AZURE_STORAGE_CONNECTION_STRING',
+    'DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;'
+)
