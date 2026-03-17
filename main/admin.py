@@ -5,8 +5,8 @@ from .models import House
 
 @admin.register(House)
 class HouseAdmin(admin.ModelAdmin):
-    list_display = ('title', 'price', 'property_type', 'bedrooms', 'bathrooms', 'city', 'available', 'created_at')
-    list_filter = ('property_type', 'available', 'city', 'state')
-    search_fields = ('title', 'address', 'city', 'description')
+    list_display = ('address', 'city', 'price', 'bedrooms', 'bathrooms', 'province', 'available', 'created_at')
+    list_filter = ('property_type', 'available', 'city', 'province')
+    search_fields = ('address', 'city', 'province', 'description')
     list_editable = ('available',)
     ordering = ('-created_at',)

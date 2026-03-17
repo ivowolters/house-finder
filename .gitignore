@@ -1,2 +1,7 @@
 /main/__pycache__
 /website/__pycache__
+db.sqlite3
+/main/management/commands/__pycache__
+/main/management/__pycache__
+/main/migrations/__pycache__
+db.sqlite3
