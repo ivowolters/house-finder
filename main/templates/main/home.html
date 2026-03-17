@@ -445,13 +445,13 @@
 
             input.addEventListener('input', (e) => {
                 const searchTerm = e.target.value.toLowerCase();
-                filteredLocations = allLocations.filter(location =>
-                    location.name.toLowerCase().includes(searchTerm)
-                );
-                highlightedIndex = -1;
-                populateDropdown(searchTerm);
 
-                if (searchTerm.length > 0 || document.activeElement === input) {
+                if (searchTerm.length > 0) {
+                    filteredLocations = allLocations.filter(location =>
+                        location.name.toLowerCase().includes(searchTerm)
+                    );
+                    highlightedIndex = -1;
+                    populateDropdown(searchTerm);
                     dropdown.classList.add('show');
                 } else {
                     dropdown.classList.remove('show');
@@ -460,12 +460,15 @@
 
             input.addEventListener('focus', () => {
                 const searchTerm = input.value.toLowerCase();
-                filteredLocations = searchTerm ?
-                    allLocations.filter(location => location.name.toLowerCase().includes(searchTerm)) :
-                    allLocations;
-                highlightedIndex = -1;
-                populateDropdown(searchTerm);
-                dropdown.classList.add('show');
+
+                if (searchTerm.length > 0) {
+                    filteredLocations = allLocations.filter(location =>
+                        location.name.toLowerCase().includes(searchTerm)
+                    );
+                    highlightedIndex = -1;
+                    populateDropdown(searchTerm);
+                    dropdown.classList.add('show');
+                }
             });
 
             input.addEventListener('keydown', (e) => {
@@ -613,10 +616,18 @@
             const cities = selectedLocations.filter(loc => loc.type === 'city').map(loc => loc.name);
             const provinces = selectedLocations.filter(loc => loc.type === 'province').map(loc => loc.name);
 
-            const searchParams = { cities, provinces };
-            console.log('Search parameters:', searchParams);
+            // Build query string
+            const params = new URLSearchParams();
+            if (cities.length > 0) {
+                params.append('cities', cities.join(','));
+            }
+            if (provinces.length > 0) {
+                params.append('provinces', provinces.join(','));
+            }
 
-            alert(`Searching for properties in:\nCities: ${cities.join(', ')}\nProvinces: ${provinces.join(', ')}`);
+            // Redirect to houses page with search parameters
+            const queryString = params.toString();
+            window.location.href = queryString ? `/houses/?${queryString}` : '/houses/';
         });
 
         // Initialize the search bar when the page loads

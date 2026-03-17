@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results - House Finder</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --secondary-color: #f8fafc;
+            --accent-color: #10b981;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --success-color: #059669;
+            --warning-color: #f59e0b;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --border-radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            padding: 40px;
+            margin-bottom: 32px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .header-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--primary-color);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            font-size: 1rem;
+        }
+
+        .back-btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .search-info {
+            background: #f0f9ff;
+            border-left: 4px solid var(--primary-color);
+            padding: 16px;
+            border-radius: 8px;
+        }
+
+        .search-info-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .search-params {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .param-tag {
+            background: var(--primary-color);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .results-section {
+            margin-bottom: 32px;
+        }
+
+        .results-header {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 24px 40px;
+            box-shadow: var(--shadow-lg);
+            margin-bottom: 24px;
+        }
+
+        .results-count {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .houses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .house-card {
+            background: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .house-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .house-image {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #4f46e5 100%);
+            height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: white;
+        }
+
+        .house-content {
+            padding: 24px;
+        }
+
+        .house-address {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .house-location {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        .house-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 16px;
+        }
+
+        .house-details {
+            display: flex;
+            gap: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 16px;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .detail-icon {
+            font-size: 1.25rem;
+        }
+
+        .house-area {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .view-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary-color) 0%, #4f46e5 100%);
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .view-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .no-results {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 60px 40px;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .no-results-icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+        }
+
+        .no-results-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .no-results-text {
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+
+        .footer-section {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 32px 40px;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+            margin-top: 32px;
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-bottom: 16px;
+        }
+
+        .nav-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-hover);
+        }
+
+        .footer-text {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 24px;
+            }
+
+            .header-top {
+                flex-direction: column;
+                gap: 16px;
+                align-items: flex-start;
+            }
+
+            .header-title {
+                font-size: 1.5rem;
+            }
+
+            .back-btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .houses-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-top">
+                <h1 class="header-title">Search Results</h1>
+                <a href="/" class="back-btn">← Back to Search</a>
+            </div>
+
+            {% if search_cities or search_provinces %}
+            <div class="search-info">
+                <div class="search-info-title">Filters Applied:</div>
+                <div class="search-params">
+                    {% for city in search_cities %}
+                    <span class="param-tag">📍 {{ city }}</span>
+                    {% endfor %}
+                    {% for province in search_provinces %}
+                    <span class="param-tag">🗺️ {{ province }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="results-section">
+            {% if houses %}
+            <div class="results-header">
+                <div class="results-count">🏠 Found {{ total_results }} Properties</div>
+            </div>
+
+            <div class="houses-grid">
+                {% for house in houses %}
+                <div class="house-card">
+                    <div class="house-image">{{ house.image }}</div>
+                    <div class="house-content">
+                        <div class="house-address">{{ house.address }}</div>
+                        <div class="house-location">
+                            {{ house.city }}, {{ house.province }}
+                        </div>
+                        <div class="house-price">{{ house.price }}</div>
+                        <div class="house-details">
+                            <div class="detail-item">
+                                <span class="detail-icon">🛏️</span>
+                                <span>{{ house.bedrooms }} bed{{ house.bedrooms|pluralize }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-icon">🚿</span>
+                                <span>{{ house.bathrooms }} bath{{ house.bathrooms|pluralize }}</span>
+                            </div>
+                        </div>
+                        <div class="house-area">
+                            <span>📐</span>
+                            <span>{{ house.area }}</span>
+                        </div>
+                        <button class="view-btn">View Details</button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="no-results">
+                <div class="no-results-icon">🔍</div>
+                <div class="no-results-title">No Properties Found</div>
+                <div class="no-results-text">
+                    Try adjusting your search criteria or browsing all available properties.
+                </div>
+                <a href="/" class="back-btn">← Back to Search</a>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="footer-section">
+            <nav class="nav-links">
+                <a href="/" class="nav-link">Home</a>
+                <a href="/about/" class="nav-link">About</a>
+                <a href="/admin/" class="nav-link">Admin</a>
+            </nav>
+            <p class="footer-text">&copy; 2025 House Finder. Built with Django.</p>
+        </div>
+    </div>
+</body>
+
+</html>
