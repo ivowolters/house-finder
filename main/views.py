@@ -194,3 +194,10 @@ def houses(request, city=None):
 def about(request):
     return HttpResponse('<h1>About Page</h1><p>This is a Django website for house finding!</p>')
 
+def robots_txt(request):
+    """Serve robots.txt with sitemap location"""
+    robots_content = """User-agent: *
+Allow: /
+Sitemap: http://example.com/sitemap.xml
+"""
+    return HttpResponse(robots_content, content_type='text/plain')
