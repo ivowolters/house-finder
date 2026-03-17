@@ -121,28 +121,51 @@ def upload_blob(file_path, blob_name=None, container_name='houses'):
         return None
 
 
-def download_blob(file_path, blob_name=None, container_name='houses'):
+def download_blob(file_path, blob_name=None, container_name='houses', max_retries=3):
     """
-    Download a file from blob storage
+    Download a file from blob storage with retry logic and chunked reading
     """
+    import time
+    import shutil
+    
     if blob_name is None:
         blob_name = os.path.basename(file_path)
     
-    try:
-        client = get_blob_service_client()
-        blob_client = client.get_blob_client(container=container_name, blob=blob_name)
+    # Create directory if it doesn't exist
+    os.makedirs(os.path.dirname(file_path) or '.', exist_ok=True)
+    
+    for attempt in range(max_retries):
+        temp_file = file_path + '.tmp'
+        try:
+            client = get_blob_service_client()
+            blob_client = client.get_blob_client(container=container_name, blob=blob_name)
+            
+            # Download to a temporary file first, reading in chunks
+            with open(temp_file, 'wb') as file_stream:
+                download_stream = blob_client.download_blob()
+                # Read in chunks to handle large files better
+                for chunk in download_stream.chunks():
+                    file_stream.write(chunk)
+            
+            # If successful, move temp file to actual location
+            if os.path.exists(temp_file):
+                shutil.move(temp_file, file_path)
+                return True
         
-        # Create directory if it doesn't exist
-        os.makedirs(os.path.dirname(file_path) or '.', exist_ok=True)
-        
-        with open(file_path, 'wb') as file_stream:
-            download_stream = blob_client.download_blob()
-            file_stream.write(download_stream.readall())
-        
-        return True
-    except Exception as e:
-        print(f"Error downloading blob {blob_name}: {e}")
-        return False
+        except Exception as e:
+            print(f"Attempt {attempt + 1}/{max_retries}: Error downloading blob {blob_name}: {e}")
+            # Clean up temp file if it exists
+            try:
+                if os.path.exists(temp_file):
+                    os.remove(temp_file)
+            except:
+                pass
+            
+            if attempt < max_retries - 1:
+                time.sleep(1)  # Wait before retrying
+    
+    print(f"Failed to download {blob_name} after {max_retries} attempts")
+    return False
 
 
 def sync_database_from_blob(container_name='houses'):
@@ -151,7 +174,7 @@ def sync_database_from_blob(container_name='houses'):
     """
     from django.conf import settings
     
-    db_path = settings.DATABASES['default']['NAME']
+    db_path = str(settings.DATABASES['default']['NAME'])
     
     try:
         download_blob(db_path, blob_name='db.sqlite3', container_name=container_name)
