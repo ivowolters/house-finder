@@ -119,3 +119,44 @@ def upload_blob(file_path, blob_name=None, container_name='houses'):
     except Exception as e:
         print(f"Error uploading blob: {e}")
         return None
+
+
+def download_blob(file_path, blob_name=None, container_name='houses'):
+    """
+    Download a file from blob storage
+    """
+    if blob_name is None:
+        blob_name = os.path.basename(file_path)
+    
+    try:
+        client = get_blob_service_client()
+        blob_client = client.get_blob_client(container=container_name, blob=blob_name)
+        
+        # Create directory if it doesn't exist
+        os.makedirs(os.path.dirname(file_path) or '.', exist_ok=True)
+        
+        with open(file_path, 'wb') as file_stream:
+            download_stream = blob_client.download_blob()
+            file_stream.write(download_stream.readall())
+        
+        return True
+    except Exception as e:
+        print(f"Error downloading blob {blob_name}: {e}")
+        return False
+
+
+def sync_database_from_blob(container_name='houses'):
+    """
+    Download the database from blob storage and use it locally
+    """
+    from django.conf import settings
+    
+    db_path = settings.DATABASES['default']['NAME']
+    
+    try:
+        download_blob(db_path, blob_name='db.sqlite3', container_name=container_name)
+        print(f"Successfully synced database from blob storage")
+        return True
+    except Exception as e:
+        print(f"Error syncing database: {e}")
+        return False
