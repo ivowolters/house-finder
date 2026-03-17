@@ -34,7 +34,7 @@ def home(request):
     
     return render(request, 'main/home.html', context)
 
-def houses(request):
+def houses(request, city=None):
     # Static list of 10 sample houses
     houses_list = [
         {
@@ -157,13 +157,28 @@ def houses(request):
     cities = [c.strip() for c in cities if c.strip()]
     provinces = [p.strip() for p in provinces if p.strip()]
     
+    # If city is provided in URL (catch-all), use it as a search filter
+    # Convert hyphens to spaces to match city names (e.g., "the-hague" -> "The Hague")
+    if city and not cities and not provinces:
+        # Capitalize the city name properly
+        url_city = city.replace('-', ' ').title()
+        # Check if it matches any house city
+        city_variations = [
+            url_city,
+            city.title(),
+            city.capitalize(),
+        ]
+        cities = [c for h_city in [h['city'] for h in houses_list] for c in city_variations if c.lower() == h_city.lower()]
+        if not cities and url_city.lower() in [h['city'].lower() for h in houses_list]:
+            cities = [url_city]
+    
     # Filter houses based on search parameters (if any provided)
     if cities or provinces:
         filtered_houses = []
         for house in houses_list:
             if (not cities and not provinces) or \
-               (house['city'] in cities) or \
-               (house['province'] in provinces):
+               (any(house['city'].lower() == c.lower() for c in cities)) or \
+               (any(house['province'].lower() == p.lower() for p in provinces)):
                 filtered_houses.append(house)
         houses_list = filtered_houses
     
